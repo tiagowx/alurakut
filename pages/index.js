@@ -5,16 +5,16 @@
 import React from 'react';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
-import { 
-        AlurakutMenu, 
-        AlurakutProfileSidebarMenuDefault, 
-        OrkutNostalgicIconSet 
-    } from '../src/libs/AlurakutCommons';
+import {
+    AlurakutMenu,
+    AlurakutProfileSidebarMenuDefault,
+    OrkutNostalgicIconSet
+} from '../src/libs/AlurakutCommons';
 
-import {ProfileRelationsBoxWrapper} from '../src/components/PeopleRelations'
+import { ProfileRelationsBoxWrapper } from '../src/components/PeopleRelations'
 
 function ProfileSideBar(propriedades) {
-    
+
     return (
         <Box as="aside">
             <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px' }} />
@@ -28,6 +28,26 @@ function ProfileSideBar(propriedades) {
             <AlurakutProfileSidebarMenuDefault />
 
         </Box>
+    )
+}
+
+function ProfileRelationBox(propriedades) {
+    return (
+        <ProfileRelationsBoxWrapper>
+            <h2 className="smallTitle">{propriedades.title} ({propriedades.items.length})</h2>
+            <ul>
+                {/* {items.map((currentItems)=>{
+                    return (
+                        <li key={currentItems.id}>
+                            <a href={`/users/${currentItems.title}`} key={currentItems.title} >  
+                                <img src={currentItems.image} />
+                                <span>{ currentItems.title }</span>
+                            </a>
+                        </li>
+                    );
+                })}  */}
+            </ul>
+        </ProfileRelationsBoxWrapper>
     )
 }
 
@@ -49,6 +69,23 @@ export default function Home() {
         'felipefialho'
     ]
 
+    // 0 - Pegar o array de dados do Github
+    const [followers, setFollowers] = React.useState([]);
+
+    React.useEffect(function () {
+        fetch('https://api.github.com/users/tiagowx/followers')
+            .then(function (responseFromServer) {
+                return responseFromServer.json();
+            }).then(function (responseComplete) {
+                setFollowers(responseComplete);
+            });
+    }, [])
+
+
+    // 1 - Criar um box com um map, baseado nos itens do array do Github
+
+
+
     return (
         <>
             <AlurakutMenu />
@@ -63,7 +100,7 @@ export default function Home() {
                         <h1>Bem vindo (a)</h1>
 
                         <OrkutNostalgicIconSet />
-                        
+
                     </Box>
 
                     <Box>
@@ -91,54 +128,57 @@ export default function Home() {
                                     name="title"
                                     aria-label="Qual o nome da sua comunidade?"
                                     type="text"
-                                 />
+                                />
                             </div>
                             <div>
                                 <input
                                     placeholder="Coloque a URL da capa"
                                     name="image"
                                     aria-label="Coloque a URL da capa"
-                                 />
+                                />
                             </div>
                             <button>
                                 Criar Comunidade
                             </button>
-                            
+
                         </form>
                     </Box>
                 </div>
                 <div className="profileRelationsArea" style={{ gridArea: "profileRelationsArea" }}>
+
+                    <ProfileRelationBox title="Seguidores" items={followers} />
+
                     <ProfileRelationsBoxWrapper>
-                        <h2 className="smallTitle">Comunidades ({communities.length })</h2>
+                        <h2 className="smallTitle">Comunidades ({communities.length})</h2>
                         <ul>
-                            {communities.map((currentCommunity)=>{
+                            {communities.map((currentCommunity) => {
                                 return (
                                     <li key={currentCommunity.id}>
-                                        <a href={`/users/${currentCommunity.title}`} key={currentCommunity.title} >  
+                                        <a href={`/users/${currentCommunity.title}`} key={currentCommunity.title} >
                                             <img src={currentCommunity.image} />
-                                            <span>{ currentCommunity.title }</span>
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                        </ul>    
-                    </ProfileRelationsBoxWrapper>
-                    <ProfileRelationsBoxWrapper>
-                        <h2 className="smallTitle">Pessoas Favoritas ({pessoasFavoritas.length})</h2>
-                        
-                        <ul>
-                            {pessoasFavoritas.map((currentPeople) => {
-                                return (
-                                    <li key={currentPeople}>
-                                        <a href={`https://github.com//${currentPeople}`}>  
-                                            <img src={`https://github.com/${currentPeople}.png`} />
-                                            <span>{ currentPeople }</span>
+                                            <span>{currentCommunity.title}</span>
                                         </a>
                                     </li>
                                 );
                             })}
                         </ul>
-                        
+                    </ProfileRelationsBoxWrapper>
+                    <ProfileRelationsBoxWrapper>
+                        <h2 className="smallTitle">Pessoas Favoritas ({pessoasFavoritas.length})</h2>
+
+                        <ul>
+                            {pessoasFavoritas.map((currentPeople) => {
+                                return (
+                                    <li key={currentPeople}>
+                                        <a href={`https://github.com//${currentPeople}`}>
+                                            <img src={`https://github.com/${currentPeople}.png`} />
+                                            <span>{currentPeople}</span>
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+
                     </ProfileRelationsBoxWrapper>
                 </div>
             </MainGrid>
