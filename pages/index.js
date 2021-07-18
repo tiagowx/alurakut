@@ -73,12 +73,25 @@ export default function Home() {
     const [followers, setFollowers] = React.useState([]);
 
     React.useEffect(function () {
+        //GET
         fetch('https://api.github.com/users/tiagowx/followers')
             .then(function (responseFromServer) {
                 return responseFromServer.json();
             }).then(function (responseComplete) {
                 setFollowers(responseComplete);
             });
+
+        fetch('https://graphql.datocms.com/', {
+            method: 'POST',
+            headers: {
+                'Authorization': '0e18553f8ce24b937ddd149ea614b4',
+                'Content-Type': 'application/json',
+                'Accept: application/json',
+                .stringify()
+            }
+
+        })
+
     }, [])
 
 
