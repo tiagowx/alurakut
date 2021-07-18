@@ -52,11 +52,7 @@ function ProfileRelationBox(propriedades) {
 }
 
 export default function Home() {
-    const [communities, setCommunities] = React.useState([{
-        id: '789654231',
-        title: 'Eu Odeio Acordar Cedo',
-        image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-    }]);
+    const [communities, setCommunities] = React.useState([]);
     console.log(communities);
     const usuarioAleatorio = `tiagowx`;
     //const communities = ['alurakut'];
@@ -86,12 +82,23 @@ export default function Home() {
             headers: {
                 'Authorization': '0e18553f8ce24b937ddd149ea614b4',
                 'Content-Type': 'application/json',
-                'Accept: application/json',
-                .stringify()
-            }
-
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ "query": ` query {
+                allCommunities {
+                  id
+                  title
+                  imageUrl
+                  creatorSlug
+                }
+            } ` })
         })
-
+        .then((response) => response.json()) // arrow function direto para resposta
+        .then((fullResponse) => {
+            const c = fullResponse.data.allCommunities;
+            console.log(c)
+            setCommunities (c)
+        })
     }, [])
 
 
@@ -126,14 +133,27 @@ export default function Home() {
                             // console.log ('Campo: ', dataOfForm.get('image'));
 
                             const community = {
-                                id: new Date().toISOString(),
+                                //id: new Date().toISOString(),
                                 title: dataOfForm.get('title'),
-                                image: dataOfForm.get('image')
+                                imageUrl: dataOfForm.get('image'),
+                                creatorSlug: usuarioAleatorio
                             }
 
-                            //communities.push(`Alura Stars`);
-                            const communitiesRefresh = [...communities, community];
-                            setCommunities(communitiesRefresh);
+                            fetch('/api/communities', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(community)
+                            })
+                            .then(async (response) => {
+                                const datas = await response.json();
+                                console.log(datas.registerCreated);
+                                const community = datas.registerCreated;
+                                const communitiesRefresh = [...communities, community];
+                                setCommunities(communitiesRefresh);
+                            })
+
                         }}>
                             <div>
                                 <input
@@ -167,8 +187,8 @@ export default function Home() {
                             {communities.map((currentCommunity) => {
                                 return (
                                     <li key={currentCommunity.id}>
-                                        <a href={`/users/${currentCommunity.title}`} key={currentCommunity.title} >
-                                            <img src={currentCommunity.image} />
+                                        <a href={`/communities/${currentCommunity.id}`} key={currentCommunity.title} >
+                                            <img src={currentCommunity.imageUrl} />
                                             <span>{currentCommunity.title}</span>
                                         </a>
                                     </li>
